@@ -1,35 +1,50 @@
-#include<vector>
+#pragma warning(disable:4996)
 #include<iostream>
+#include<vector>
 
 using namespace std;
 
-void dfs(vector<vector<pair<int, int>>> & vecs, vector<bool> & visit, int i)
+int dfs(vector<vector<pair<int, int>>> & graph, vector<bool> & isVisitied, int i)
 {
-	visit[i] = true;
-	cout << i << " ";
-	for (pair<int, int> p : vecs[i])
+	int res = 1;
+	isVisitied[i] = true;
+	printf("%d ", i);
+	for (int j = 0; j < graph[i].size(); j++)
 	{
-		if (!visit[p.first])
-			dfs(vecs, visit, p.first);
+		pair<int, int> p = graph[i][j];
+		if (!isVisitied[p.first])
+			res += dfs(graph, isVisitied, p.first);
 	}
+	return res;
 }
 
 int main()
 {
-	vector< vector < pair<int, int> > > vecs;
-	vector<bool> visit;
-	int nV = 6, nE = 8;
-	vecs.resize(nV+1);
-	visit.resize(nV + 1);
-	fill(visit.begin(), visit.end(), false);
-
+	vector< vector<pair<int, int>>> graph;
+	vector<bool> isVisited;
+	int nV, nE;
+	scanf("%d %d", &nV, &nE);
+	graph.resize(nV + 1);
+	isVisited.resize(nV + 1);
+	fill(isVisited.begin(), isVisited.end(), false);
 	for (int i = 0; i < nE; i++)
 	{
 		int s, e, w;
-		cin >> s >> e >> w;
-		vecs[s].push_back(make_pair(e, w));
-		vecs[e].push_back(make_pair(s, w));
+		scanf("%d %d %d", &s, &e, &w);
+		graph[s].push_back(make_pair(e, w));
+		graph[e].push_back(make_pair(s, w));
 	}
-	dfs(vecs, visit, 1);
+
+	int cnt = 0;
+	for (int i = 1; i <= nV; i++)
+	{
+		if (!isVisited[i])
+		{
+			int res = dfs(graph, isVisited, i);
+			printf("\n%d\n", res);
+			cnt++;
+		}
+	}
+	printf("%d\n", cnt);
 	return 0;
 }

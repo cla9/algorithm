@@ -1,39 +1,53 @@
+#pragma warning(disable:4996)
 #include<iostream>
 #include<vector>
+#include<algorithm>
 
 using namespace std;
 
-void dfs(vector<vector<int>> & vecs, vector<bool> & visit, int i)
+long dfs(vector<vector<int>> & graph, vector<bool> & isVisited, int idx)
 {
-	visit[i] = true;
-	cout << i << " ";
-	int size = vecs[i].size();
-	for (int j = 0; j < size; j++)
+	long res = 1;
+	isVisited[idx] = true;
+	cout << idx << " ";
+	for (int i = 0; i < graph.size(); i++)
 	{
-		if (vecs[i][j] != 0 && !visit[j])
-			dfs(vecs, visit, j);
+		if (graph[idx][i] && !isVisited[i])
+			res += dfs(graph, isVisited, i);
 	}
+	return res;
 }
 
 int main()
 {
-	int nV = 6, nE = 8;
-	vector<vector<int>> vecs;
-	vector<bool> visit;
-	vecs.resize(nV + 1);
-	visit.resize(nV + 1);
-	for (int i = 1; i <= nV; i++)
+	vector<vector<int>> graph;
+	vector<bool> isVisited;
+	int nV, nE;
+	scanf("%d %d", &nV, &nE);
+	graph.resize(nV + 1);
+	for (int i = 1; i < nV + 1; i++)
 	{
-		vecs[i].resize(nV + 1);
-		fill(vecs[i].begin(), vecs[i].end(), 0);
+		graph[i].resize(nV + 1);
+		fill(graph[i].begin(), graph[i].end(), 0);
 	}
-	fill(visit.begin(), visit.end(), false);
+	isVisited.resize(nV + 1);
+	fill(isVisited.begin(), isVisited.end(), false);
 	for (int i = 0; i < nE; i++)
 	{
 		int s, e, w;
-		cin >> s >> e >> w;
-		vecs[s][e] = vecs[e][s] = w;
+		scanf("%d %d %d", &s, &e, &w);
+		graph[s][e] = graph[e][s] = w;
 	}
-	dfs(vecs, visit, 1);
-	return 0;
+	int cnt = 0;
+	for (int i = 1; i <= nV; i++)
+	{
+		if (!isVisited[i])
+		{
+			int res = dfs(graph, isVisited, i);
+			printf("\n %d\n", res);
+			cnt++;
+		}
+	}
+	printf("%d\n", cnt)
+		return 0;
 }
