@@ -3,7 +3,32 @@
 #include<vector>
 #define MAX 1e9
 using namespace std;
+/*
+5 10
+5
+1 2 2
+1 3 2
+1 4 5
+1 5 9
+2 3 3
+2 4 4
+2 5 8
+3 4 7
+3 5 6
+4 5 5
+답
+8
+1 3 5
 
+음수 사이클 존재 경우
+5 5
+5
+1 2 2
+3 2 -1
+4 3 -4
+2 4 3
+2 5 1
+*/
 int main()
 {
 	vector<vector<int>> graph;
@@ -51,7 +76,7 @@ int main()
 	bool mCycle = false;
 	for (int i = 0; i < nV; i++)
 	{
-		if (graph[i][i])
+		if (graph[i][i]<0)
 		{
 			mCycle = true;
 			break;

@@ -4,6 +4,21 @@
 #include<algorithm>
 using namespace std;
 
+/*
+7 7
+1 4
+4 5
+5 1
+1 6
+6 7
+2 7
+7 3
+
+´ä
+3
+1 6 7
+
+*/
 long findCutVex(vector<vector<pair<int, int>>> & graph, vector<bool> & apList, int curIdx, bool isRoot, int order, long * pOrder, int & num_of_child)
 {
 	long ret, m;
