@@ -1,14 +1,12 @@
 #pragma warning(disable:4996)
 #include<iostream>
 #include<vector>
+#include<functional>
 #include<algorithm>
 #include<queue>
-#include<functional>
-#include<limits.h>
-using namespace std;
 /*
 5 10
-5
+1 5
 1 2 2
 1 3 2
 1 4 5
@@ -24,55 +22,40 @@ using namespace std;
 8
 1 3 5
 */
+#define INF static_cast<int>(2e9)
+using namespace std;
+typedef pair<int, int> P;
 int main()
 {
-	
-	vector<vector<pair<int, int>>> graph;
-	int nV, nE, dst;
-	scanf("%d %d", &nV, &nE);
-	scanf("%d", &dst);
-	graph.resize(nV);
+	int nV, nE, src, dst;
+	scanf("%d %d %d %d", &nV, &nE, &src, &dst);
+	src--; dst--;
+	vector<vector<P>> graph(nV);
+	vector<bool> visited(nV, false);
+	vector<int> parent(nV, -1);
+	vector<int> dist(nV, INF);
+
 	for (int i = 0; i < nE; i++)
 	{
 		int s, e, w;
 		scanf("%d %d %d", &s, &e, &w);
 		s--; e--;
-		//다익 스트라는 유향그래프에서 쓰는 것이 좋다.
 		graph[s].push_back(make_pair(e, w));
 	}
-	
-	priority_queue < pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-	vector<bool> isVisitied;
-	vector<int> dist;
-	vector<int> parent;
-	dist.resize(nV);
-	isVisitied.resize(nV);
-	parent.resize(nV);
-	fill(isVisitied.begin(), isVisitied.end(), false);
-	fill(dist.begin(), dist.end(), INT_MAX);
-	fill(parent.begin(), parent.end(), -1);
-	dist[0] = 0;
-
-	//dist, idx
-	pq.push(make_pair(0,0));
-
+	priority_queue<P, vector<P>, greater<P>> pq;
+	pq.push(make_pair(0, src));
+	dist[src] = 0;
 	while (!pq.empty())
 	{
-		pair<int, int> p = pq.top();
+		int curr = pq.top().second;
 		pq.pop();
-
-		int curr = p.second;
-		
-		if (isVisitied[curr]) continue;
-
-		isVisitied[curr] = true;
-		//인접 리스트 조사
-		for (int i = 0; i < graph[curr].size(); i++)
+		if (visited[curr]) continue;
+		visited[curr] = true;
+		for (P & p : graph[curr])
 		{
-			int next = graph[curr][i].first;
-			int nextd = graph[curr][i].second ;
-
-			if (!isVisitied[next] && dist[next] > dist[curr] + nextd)
+			int next = p.first;
+			int nextd = p.second;
+			if (!visited[next] && dist[next] > dist[curr] + nextd)
 			{
 				dist[next] = dist[curr] + nextd;
 				parent[next] = curr;
@@ -80,8 +63,7 @@ int main()
 			}
 		}
 	}
-
-	int idx = dst - 1;
+	int idx = dst;
 	printf("%d\n", dist[idx]);
 	vector<int> res;
 	while (parent[idx] != -1)
@@ -90,9 +72,8 @@ int main()
 		idx = parent[idx];
 	}
 	res.push_back(idx);
-
-	for (int i = res.size()-1; i >=0; i--)
+	for (int i = res.size() - 1; i >= 0; i--)
 		printf("%d ", res[i] + 1);
-	printf("\n");
+	puts("");
 	return 0;
 }

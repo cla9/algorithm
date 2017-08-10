@@ -1,10 +1,10 @@
 #pragma warning(disable:4996)
 #include<iostream>
 #include<vector>
-#include<limits.h>
+#define INF 2e9
 /*
 5 10
-5
+1 5
 1 2 2
 1 3 2
 1 4 5
@@ -21,63 +21,59 @@
 
 음수 사이클 존재 경우
 5 5
-5
+1 5
 1 2 2
 3 2 -1
 4 3 -4
 2 4 3
 2 5 1
 */
-
-
 using namespace std;
 
 int main()
 {
-	vector<vector<pair<int, int>>> graph;
-	vector<int> dist;
-	vector<int> parent;
-	int nV, nE;
-	int dst;
+	int nV, nE, src, dst;
+	scanf("%d %d %d %d", &nV, &nE, &src, &dst);
+	src--; dst--;
+	vector<vector<pair<int, int>>> graph(nV);
+	vector<int> parent(nV, -1);
+	vector<bool> visited(nV, false);
+	vector<int> dist(nV, INF);
 
-	scanf("%d %d", &nV, &nE);
-	scanf("%d", &dst);
-	graph.resize(nV);
-	parent.resize(nV);
-	fill(parent.begin(), parent.end(), -1);
-	dist.resize(nV);
-	fill(dist.begin(), dist.end(), 1e9);
+
 	for (int i = 0; i < nE; i++)
 	{
 		int s, e, w;
 		scanf("%d %d %d", &s, &e, &w);
-		graph[s - 1].push_back(make_pair(e - 1, w));
+		s--; e--;
+		graph[s].push_back(make_pair(e, w));
 	}
-	bool ismCycle = false;
-	dist[0] = 0;
+
+	dist[src] = 0;
+	bool isCycle = false;
 	for (int i = 0; i < nV; i++)
 	{
 		for (int j = 0; j < nV; j++)
 		{
-			for (int k = 0; k < graph[j].size(); k++)
+			for (pair<int, int> & p : graph[j])
 			{
-				int next = graph[j][k].first;
-				int nextd = graph[j][k].second;
-				if (dist[j] != 1e9 && dist[next] > dist[j] + nextd)
+				int next = p.first;
+				int nextd = p.second;
+				if (dist[next] > dist[j] + nextd)
 				{
 					dist[next] = dist[j] + nextd;
 					parent[next] = j;
-					if (i == nV - 1) ismCycle = true;
+					if (i == nV - 1) isCycle = true;
 				}
 			}
 		}
 	}
-	if (ismCycle) printf("Minus Cycle\n");
+	if (isCycle) puts("negative cycle");
 	else
 	{
-		int idx = dst - 1;
-		printf("%d\n", dist[idx] == 1e9? -1 : dist[idx]);
+		int idx = dst;
 		vector<int> res;
+		printf("%d\n", dist[idx]);
 		while (parent[idx] != -1)
 		{
 			res.push_back(idx);
@@ -85,8 +81,8 @@ int main()
 		}
 		res.push_back(idx);
 		for (int i = res.size() - 1; i >= 0; i--)
-			printf("%d ", res[i]+1);
-		printf("\n");
+			printf("%d ", res[i] + 1);
+		puts("");
 	}
 	return 0;
 }

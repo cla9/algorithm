@@ -1,11 +1,10 @@
 #pragma warning(disable:4996)
 #include<iostream>
 #include<vector>
-#define MAX 1e9
-using namespace std;
+#define INF static_cast<int>(2e9)
 /*
 5 10
-5
+1 5
 1 2 2
 1 3 2
 1 4 5
@@ -22,33 +21,31 @@ using namespace std;
 
 음수 사이클 존재 경우
 5 5
-5
+1 5
 1 2 2
 3 2 -1
 4 3 -4
 2 4 3
 2 5 1
 */
+using namespace std;
+
 int main()
 {
-	vector<vector<int>> graph;
-	vector<vector<int>> parent;
-	int nV, nE, dst;
-	scanf("%d %d", &nV, &nE);
-	scanf("%d", &dst);
+	int nV, nE, src, dst;
+	scanf("%d %d %d %d", &nV, &nE, &src, &dst);
+	src--; dst--;
 
-	graph.resize(nV);
-	parent.resize(nV);
+	vector<vector<int>> graph(nV);
+	vector<vector<int>> parent(nV);
 	for (int i = 0; i < nV; i++)
 	{
 		graph[i].resize(nV);
-		fill(graph[i].begin(), graph[i].end(), MAX);
-		graph[i][i] = 0;
-
 		parent[i].resize(nV);
+		fill(graph[i].begin(), graph[i].end(), INF);
 		fill(parent[i].begin(), parent[i].end(), -1);
+		graph[i][i] = 0;
 	}
-
 	for (int i = 0; i < nE; i++)
 	{
 		int s, e, w;
@@ -72,31 +69,26 @@ int main()
 			}
 		}
 	}
-	
-	bool mCycle = false;
+	bool isCycle = false;
 	for (int i = 0; i < nV; i++)
-	{
-		if (graph[i][i]<0)
-		{
-			mCycle = true;
-			break;
-		}
-	}
+	if (graph[i][i]<0)
+		isCycle = true;
 
-	if (mCycle) printf("minus cycle\n");
+	if (isCycle)
+		puts("negative cycle");
 	else
 	{
-		int idx = dst - 1;
-		printf("%d\n", graph[0][idx]);
+		int idx = dst;
 		vector<int> res;
-		while (parent[0][idx] != -1)
+		printf("%d\n", graph[src][idx]);
+		while (parent[src][idx] != -1)
 		{
 			res.push_back(idx);
-			idx = parent[0][idx];
+			idx = parent[src][idx];
 		}
 		res.push_back(idx);
 		for (int i = res.size() - 1; i >= 0; i--)
-			printf("%d ",res[i]+1);
-		printf("\n");
+			printf("%d ", res[i] + 1);
+		puts("");
 	}
 }

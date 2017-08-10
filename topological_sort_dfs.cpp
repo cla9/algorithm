@@ -8,7 +8,7 @@ using namespace std;
 1 3
 2 3
 
-ans) 
+ans)
 1 2 3
 2 1 3
 
@@ -19,56 +19,53 @@ ans)
 ans)
 4 2 3 1
 4 3 2 1
-*/
-void dfs(vector<vector<pair<int, int>>> & graph, vector<bool> & isVisited, vector<bool> & finished, stack<int> & st, bool & mCycle, int i)
-{
-	isVisited[i] = true;
-	for (int j = 0; j < graph[i].size(); j++)
-	{
-		int next = graph[i][j].first;
 
-		if (!isVisited[next])
-			dfs(graph, isVisited, finished, st, mCycle, next);
+3 3
+1 2
+2 3
+3 1
+
+ans)
+cycle
+*/
+void dfs(vector <vector<int>> & graph, vector<bool> & visited, vector<bool> & finished, int curr, bool & isCycle, stack<int> & st)
+{
+	visited[curr] = true;
+	for (int next : graph[curr])
+	{
+		if (!visited[next])
+			dfs(graph, visited, finished, next, isCycle, st);
 		else if (!finished[next])
-			mCycle = true;
+			isCycle = true;
 	}
-	finished[i] = true;
-	st.push(i);
+	finished[curr] = true;
+	st.push(curr);
 }
 int main()
 {
-	vector<vector<pair<int, int>>> graph;
-	vector<bool> visited;
-	vector<bool> finished;
 	int nV, nE;
 	scanf("%d %d", &nV, &nE);
-	graph.resize(nV);
-	visited.resize(nV);
-	finished.resize(nV);
-	fill(visited.begin(), visited.end(), false);
-	fill(finished.begin(), finished.end(), false);
-
+	vector<vector<int>> graph(nV);
+	vector<bool> visited(nV, false);
+	vector<bool> finished(nV, false);
 	for (int i = 0; i < nE; i++)
 	{
 		int s, e;
 		scanf("%d %d", &s, &e);
 		s--; e--;
-		graph[s].push_back(make_pair(e, 1));
+		graph[s].push_back(e);
 	}
-
-	bool mCycle;
 	stack<int> st;
+	bool isCycle = false;
 	for (int i = 0; i < nV; i++)
 	{
-		mCycle = false;
 		if (!visited[i])
 		{
-			dfs(graph, visited, finished, st, mCycle, i);
-			if (mCycle)	break;
+			dfs(graph, visited, finished, i, isCycle, st);
+			if (isCycle) break;
 		}
 	}
-
-	if (mCycle) puts("cycle");
+	if (isCycle) puts("cycle");
 	else
 	{
 		while (!st.empty())

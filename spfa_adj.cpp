@@ -1,9 +1,8 @@
 #pragma warning(disable:4996)
 #include<iostream>
-#include<vector>
 #include<queue>
-#define INF 1e9
-using namespace std;
+#include<vector>
+#define INF static_cast<int>(2e9)
 /*
 5 10
 1 5
@@ -30,30 +29,18 @@ using namespace std;
 2 4 3
 2 5 1
 */
+using namespace std;
 
 int main()
 {
-	vector<vector<pair<int, int>>> graph;
-	vector<int> parent;
-	vector<int> dist;
-	vector<int> uptCnt;
-	vector<bool> isInQueue;
-	
-	int nV, nE;
-	int src, dst;
-	scanf("%d %d", &nV, &nE);
-	scanf("%d %d", &src, &dst);
-	graph.resize(nV);
-	uptCnt.resize(nV);
-	dist.resize(nV);
-	parent.resize(nV);
-	isInQueue.resize(nV);
-
-	fill(dist.begin(), dist.end(), INF);
-	fill(parent.begin(), parent.end(), -1);
-	fill(isInQueue.begin(), isInQueue.end(), false);
-	fill(uptCnt.begin(), uptCnt.end(), 0);
-	
+	int nV, nE, src, dst;
+	scanf("%d %d %d %d", &nV, &nE, &src, &dst);
+	src--; dst--;
+	vector<vector<pair<int, int>>> graph(nV);
+	vector<int> dist(nV, INF);
+	vector<bool> isInQueue(nV, false);
+	vector<int> uptCnt(nV, 0);
+	vector<int> parent(nV, -1);
 	for (int i = 0; i < nE; i++)
 	{
 		int s, e, w;
@@ -61,35 +48,27 @@ int main()
 		s--; e--;
 		graph[s].push_back(make_pair(e, w));
 	}
-
-
-	src--;
-	dist[src] = 0;
-
 	queue<int> q;
+	bool isCycle = false;
 	q.push(src);
 	isInQueue[src] = true;
-
-	bool mCycle = false;
-	int qCnt = 0;
-	
-	while (!q.empty() && !mCycle)
+	dist[src] = 0;
+	while (!q.empty() && !isCycle)
 	{
-		int curr = q.front(); q.pop();
+		int curr = q.front();
+		q.pop();
 		isInQueue[curr] = false;
-
-		for (int i = 0; i < graph[curr].size(); i++)
+		for (pair<int, int> & p : graph[curr])
 		{
-			int next = graph[curr][i].first;
-			int nextd = graph[curr][i].second;
+			int next = p.first;
+			int nextd = p.second;
 			if (dist[next] > dist[curr] + nextd)
 			{
 				dist[next] = dist[curr] + nextd;
 				parent[next] = curr;
-				uptCnt[next]++;
-				if (uptCnt[next] == nV)
+				if (++uptCnt[next] == nV)
 				{
-					mCycle = true;
+					isCycle = true;
 					break;
 				}
 				if (!isInQueue[next])
@@ -100,11 +79,10 @@ int main()
 			}
 		}
 	}
-	
-	if (mCycle) puts("negative cycle");
+	if (isCycle) puts("negative cycle");
 	else
 	{
-		int idx = dst - 1;
+		int idx = dst;
 		vector<int> res;
 		printf("%d\n", dist[idx]);
 		while (parent[idx] != -1)

@@ -73,8 +73,8 @@ int main()
 	FindCutVex(graph, apList);
 	vector<int> res;
 	for (int i = 0; i < apList.size(); i++)
-	if (apList[i])
-		res.push_back(i);
+		if (apList[i])
+			res.push_back(i);
 	printf("%d\n", res.size());
 	for (int i = 0; i < res.size(); i++)
 		printf("%d ", res[i]);
