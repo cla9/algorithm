@@ -37,7 +37,6 @@ int main()
 	src--; dst--;
 	vector<vector<pair<int, int>>> graph(nV);
 	vector<int> parent(nV, -1);
-	vector<bool> visited(nV, false);
 	vector<int> dist(nV, INF);
 
 

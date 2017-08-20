@@ -1,12 +1,11 @@
+#pragma warning(disable:4996)
 #include<iostream>
 #include<vector>
 #include<algorithm>
-
-using namespace std;
 /*
 DFS 스패닝 트리를 이용하여 A번째 정점에서 부모로 가는 간선을 제외하고 나머지 간선에서 아직 방문안한 노드에서 얻어온 discover 번호가 나의 discover 번호보다 클 경우 단절선이 됩니다.
 http://jason9319.tistory.com/119
- 
+
 7 8
 1 4
 4 5
@@ -21,58 +20,53 @@ http://jason9319.tistory.com/119
 1 6
 6 7
 */
-long _findAE(vector<vector<pair<int, int>>> & graph, long curIdx, long par, long order, vector<pair<int, int>> & apList, long * pOrder)
+using namespace std;
+
+vector<vector<int>> graph;
+vector<pair<int, int>> bridge;
+vector<int> order;
+int num;
+
+int dfs(int curr, int par)
 {
-	long ret, m;
-	pOrder[curIdx] = ret = ++order;
-	for (pair<int, int> p : graph[curIdx])
+	int ret, m;
+	ret = order[curr] = ++num;
+	for (int next : graph[curr])
 	{
-		long nextIdx = p.first;
-		if (par == nextIdx)
-			continue;
-		if (!pOrder[nextIdx])
+		if (next == par) continue;
+		if (!order[next])
 		{
-			m = _findAE(graph, nextIdx, curIdx, order, apList, pOrder);
-			ret = min(m, ret);
-			if (m > pOrder[curIdx]) 
-				apList.push_back(make_pair(min(curIdx, nextIdx), max(curIdx, nextIdx)));
+			m = dfs(next, curr);
+			ret = min(ret, m);
+			if (m > order[curr]) bridge.push_back(make_pair(min(curr, next), max(curr, next)));
 		}
 		else
-			ret = min(pOrder[nextIdx], ret);
+			ret = min(ret, order[next]);
 	}
 	return ret;
 }
-void FindAE(vector<vector<pair<int, int>>> & graph, vector<pair<int, int>> & aeList)
-{
-	long * pOrder = new long[graph.size()];
-	fill(pOrder, pOrder + graph.size(), 0);
-
-	for (int i = 1; i < graph.size(); i++)
-	if (!pOrder[i])
-		_findAE(graph, i, 0, 0, aeList, pOrder);
-
-	delete[] pOrder;
-}
-
 int main()
 {
-	vector<vector<pair<int, int>>> graph;
 	int nV, nE;
-	vector<pair<int, int>> aeList;
-	cin >> nV >> nE;
-	graph.resize(nV + 1);
+	scanf("%d %d", &nV, &nE);
+	graph.resize(nV);
+	order.resize(nV);
+	fill(order.begin(), order.end(), 0);
 	for (int i = 0; i < nE; i++)
 	{
 		int s, e;
-		cin >> s >> e;
-		graph[s].push_back(make_pair(e, 1));
-		graph[e].push_back(make_pair(s, 1));
+		scanf("%d %d", &s, &e);
+		s--; e--;
+		graph[s].push_back(e);
+		graph[e].push_back(s);
 	}
-	FindAE(graph, aeList);
-	sort(aeList.begin(), aeList.end());
-	printf("%d\n", aeList.size());
-	for (pair<int, int> p : aeList)
-		printf("%d %d\n", p.first, p.second);
-
+	for (int i = 0; i < nV; i++)
+	if (!order[i])
+		dfs(i, i);
+	sort(bridge.begin(), bridge.end());
+	printf("%d\n", bridge.size());
+	for (int i = 0; i < bridge.size(); i++)
+		printf("%d %d\n", bridge[i].first + 1, bridge[i].second + 1);
+	puts("");
 	return 0;
 }

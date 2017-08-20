@@ -2,7 +2,6 @@
 #include<iostream>
 #include<vector>
 #include<stack>
-using namespace std;
 /*
 3 2
 1 3
@@ -28,26 +27,37 @@ ans)
 ans)
 cycle
 */
-void dfs(vector <vector<int>> & graph, vector<bool> & visited, vector<bool> & finished, int curr, bool & isCycle, stack<int> & st)
+using namespace std;
+
+vector<vector<int>> graph;
+vector<bool> visited;
+vector<bool> finished;
+stack<int> st;
+bool isCycle = false;
+void dfs(int curr)
 {
 	visited[curr] = true;
 	for (int next : graph[curr])
 	{
 		if (!visited[next])
-			dfs(graph, visited, finished, next, isCycle, st);
+			dfs(next);
 		else if (!finished[next])
 			isCycle = true;
 	}
 	finished[curr] = true;
 	st.push(curr);
 }
+
 int main()
 {
 	int nV, nE;
 	scanf("%d %d", &nV, &nE);
-	vector<vector<int>> graph(nV);
-	vector<bool> visited(nV, false);
-	vector<bool> finished(nV, false);
+	graph.resize(nV);
+	visited.resize(nV);
+	finished.resize(nV);
+	fill(visited.begin(), visited.end(), false);
+	fill(finished.begin(), finished.end(), false);
+
 	for (int i = 0; i < nE; i++)
 	{
 		int s, e;
@@ -55,16 +65,9 @@ int main()
 		s--; e--;
 		graph[s].push_back(e);
 	}
-	stack<int> st;
-	bool isCycle = false;
 	for (int i = 0; i < nV; i++)
-	{
-		if (!visited[i])
-		{
-			dfs(graph, visited, finished, i, isCycle, st);
-			if (isCycle) break;
-		}
-	}
+	if (!visited[i])
+		dfs(i);
 	if (isCycle) puts("cycle");
 	else
 	{

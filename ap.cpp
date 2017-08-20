@@ -2,8 +2,6 @@
 #include<iostream>
 #include<vector>
 #include<algorithm>
-using namespace std;
-
 /*
 7 7
 1 4
@@ -19,65 +17,66 @@ using namespace std;
 1 6 7
 
 */
-long findCutVex(vector<vector<pair<int, int>>> & graph, vector<bool> & apList, int curIdx, bool isRoot, int order, long * pOrder, int & num_of_child)
+using namespace std;
+
+vector<vector<int>> graph;
+vector<int> order;
+vector<bool> apList;
+int num;
+
+int dfs(int curr, bool isRoot, int & num_of_child)
 {
-	long ret, m;
-	pOrder[curIdx] = ret = ++order;
-	for (int i = 0; i < graph[curIdx].size(); i++)
+	int ret, m;
+	ret = order[curr] = ++num;
+	for (int next : graph[curr])
 	{
-		int nextIdx = graph[curIdx][i].first;
-		if (!pOrder[nextIdx])
+		if (!order[next])
 		{
 			if (isRoot) num_of_child++;
-			m = findCutVex(graph, apList, nextIdx, false, order, pOrder, num_of_child);
-			ret = min(m, ret);
-			if (m >= pOrder[curIdx] && !isRoot) apList[curIdx] = true;
+			m = dfs(next, false, num_of_child);
+			ret = min(ret, m);
+			if (m >= order[curr] && !isRoot) apList[curr] = true;
 		}
 		else
-			ret = min(ret, pOrder[nextIdx]);
+			ret = min(ret, order[next]);
 	}
 	return ret;
 }
-void FindCutVex(vector<vector<pair<int, int>>> & graph, vector<bool> & apList)
-{
-	long * pOrder = new long[graph.size()];
-	fill(pOrder, pOrder + graph.size(), 0);
-	for (int i = 1; i < graph.size(); i++)
-	{
-		if (!pOrder[i])
-		{
-			int num_of_child = 0;
-			findCutVex(graph, apList, i, true, 0, pOrder, num_of_child);
-			if (num_of_child > 1)
-				apList[i] = true;
-		}
-	}
-	delete[] pOrder;
-}
+
 int main()
 {
-	vector<vector<pair<int, int>>> graph;
-	vector<bool> apList;
 	int nV, nE;
 	scanf("%d %d", &nV, &nE);
-	graph.resize(nV + 1);
-	apList.resize(nV + 1);
+	graph.resize(nV);
+	order.resize(nV);
+	apList.resize(nV);
 	fill(apList.begin(), apList.end(), false);
+	fill(order.begin(), order.end(), 0);
 	for (int i = 0; i < nE; i++)
 	{
 		int s, e;
 		scanf("%d %d", &s, &e);
-		graph[s].push_back(make_pair(e, 1));
-		graph[e].push_back(make_pair(s, 1));
+		s--; e--;
+		graph[s].push_back(e);
+		graph[e].push_back(s);
 	}
-	FindCutVex(graph, apList);
+	int num_of_child = 0;
+	for (int i = 0; i < nV; i++)
+	{
+		if (!order[i])
+		{
+			num_of_child = 0;
+			dfs(i, true, num_of_child);
+			if (num_of_child > 1) apList[i] = true;
+		}
+	}
 	vector<int> res;
-	for (int i = 0; i < apList.size(); i++)
-		if (apList[i])
-			res.push_back(i);
+	for (int i = 0; i < nV; i++)
+	if (apList[i])
+		res.push_back(i);
 	printf("%d\n", res.size());
 	for (int i = 0; i < res.size(); i++)
-		printf("%d ", res[i]);
-	printf("\n");
+		printf("%d ", res[i] + 1);
+	puts("");
 	return 0;
 }
